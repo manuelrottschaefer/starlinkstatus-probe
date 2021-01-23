@@ -4,33 +4,42 @@
 # Author: Manuel Rottschaefer <mail@starlinkstatus.com>
 # License: GNU General Public License v3.0
 
+# Get latitude & longitude from command arguments
 latitude="$1"
 longitude="$2"
 
+# Check if those arguments have been passed
 if [ $# -lt 2 ]
   then
     echo "Please supply latitude and longitude as the first and second parameter, respectively"
     exit 1
 fi
 
+# Send a report to api.starlinkstatus.com
 report() {
+  # Determine avg. latency to google public DNS
   latency=$(ping -c 3 8.8.8.8 | awk -F '/' 'END {print $5}')
+  
+  # Send latitude, longitude and avg. latency to the endpoint, which handles everything else
   curl -sL -X POST https://api.starlinkstatus.com/v1/report.php -d "lat=$latitude&lon=$longitude&ping=$latency" > /dev/null
   if [[ -n $VERBOSE ]]; then
     echo "Reported latency ${latency}"
   fi
 }
 
+# Send a request to log out
 logout() {
   curl -sL -X POST https://api.starlinkstatus.com/v1/logout.php -d "lat=$latitude&lon=$longitude" > /dev/null
   exit 0
 }
 
+# Send a logout request on exit
 trap logout TERM
 trap logout EXIT
 
 while :
 do
+  # Send a status report every 30 seconds
   report
   sleep 30
 done
