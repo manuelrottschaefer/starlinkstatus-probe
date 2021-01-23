@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# starlinkstatus.com probe script
+# Author: Manuel Rottschaefer <mail@starlinkstatus.com>
+# License: GNU General Public License v3.0
+
+latitude="$1"
+longitude="$2"
+
+report() {
+  latency=$(ping -c 3 8.8.8.8 | awk -F '/' 'END {print $5}')
+  curl -sL -X POST https://api.starlinkstatus.com/v1/report.php -d "lat=$latitude&lon=$longitude&ping=$latency" > /dev/null
+}
+
+logout() {
+  curl -sL -X POST https://api.starlinkstatus.com/v1/logout.php -d "lat=$latitude&lon=$longitude" > /dev/null
+  exit 0
+}
+
+trap logout TERM
+trap logout KILL
+trap logout EXIT
+
+while :
+do
+  report
+  sleep 30
+done

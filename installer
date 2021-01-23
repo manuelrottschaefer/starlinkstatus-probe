@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# starlinkstatus.com probe installer
+# Author: Manuel Rottschaefer <mail@starlinkstatus.com>
+# License: GNU General Public License v3.0
+
+# Check if the script has root privileges. 
+# This is required to create the folders in /opt and /etc/systemd/system
+if [ "$EUID" -ne 0 ]
+  then 
+  echo "This installer needs root permissions to create directories and start services"
+  exit
+fi
+
+# Create neccessary directories
+sudo mkdir -p /opt/starlinkstatus
+sudo mkdir -p /etc/systemd/system
+
+# Download the probe file and place it into into /opt
+echo "Downloading the probe (/opt/starlinkstatus)..."
+sudo curl -sL https://probe.starlinkstatus.com/probe > /opt/starlinkstatus/probe.sh
+
+# Download the service file and place it into /etc/systemd/system
+echo "Starting the service (/etc/systemd/system)..."
+sudo curl -sL https://probe.starlinkstatus.com/service > /etc/systemd/system/starlinkstatus.service
+
+# Append command to the service file
+echo "ExecStart=sh /opt/starlinkstatus/probe.sh $1 $2" | sudo tee -a /etc/systemd/system/starlinkstatus.service > /dev/null
+
+# Reload the systemctl service manager
+sudo systemctl daemon-reload
+
+# Start the service
+sudo systemctl start starlinkstatus
+
+# Check if installation has been successful
+systemctl is-active --quiet starlinkstatus && echo "Thank you! The probe is running." || echo "Installation failed"
+

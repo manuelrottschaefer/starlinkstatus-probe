@@ -1,0 +1,15 @@
+# starlinkstatus.com probe service
+# Author: Manuel Rottschaefer <mail@starlinkstatus.com>
+# License: GNU General Public License v3.0
+
+[Unit]
+Description=starlinkstatus.com probe
+After=network.target
+Wants=network-online.target
+
+[Install]
+WantedBy=multi-user.target 
+
+[Service]
+Restart=always
+Type=simple
