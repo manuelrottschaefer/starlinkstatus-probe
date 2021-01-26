@@ -8,12 +8,12 @@ The probe for real-time status reports on the starlink satellite network.
 - Incident reports
 
 
-## Installation
-1. Copy this command
-2. Edit the latitude and longitude to match your (approximate!) location
-3. Run the command. Everything else is automated.
+## Installation: Docker (recommended)
+```bash
+docker run -d -t qlustor/starlinkstatus-probe {lat} {long}
+```
 
-**Please do not enter you exact location, it is only being used to determine your starlink cell. It is not stored permanently.**
+## Install from script
 
 ```bash
 curl -sL probe.starlinkstatus.com | sudo bash -s [Latitude] [Longitude]
@@ -22,6 +22,8 @@ Example:
 ```bash
 curl -sL probe.starlinkstatus.com | sudo bash -s 33.920 -118.328
 ```
+
+**Please do not enter you exact location.**
 
 It can take up to 12 hours until your probe will appear on the map
 
